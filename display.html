@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Padrão Mostrado</title>
+  <style>
+    body {
+      margin: 0;
+      background: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #pattern-container {
+      width: 300px;
+      height: 300px;
+      background: white;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 30px;
+      padding: 30px;
+      border-radius: 10px;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .dot {
+      width: 20px;
+      height: 20px;
+      background: black;
+      border-radius: 50%;
+      margin: auto;
+      z-index: 2;
+    }
+    .dot.active {
+      background: #0af;
+    }
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div id="pattern-container">
+  <canvas id="pattern-canvas" width="300" height="300"></canvas>
+  <div class="dot" data-id="1"></div>
+  <div class="dot" data-id="2"></div>
+  <div class="dot" data-id="3"></div>
+  <div class="dot" data-id="4"></div>
+  <div class="dot" data-id="5"></div>
+  <div class="dot" data-id="6"></div>
+  <div class="dot" data-id="7"></div>
+  <div class="dot" data-id="8"></div>
+  <div class="dot" data-id="9"></div>
+</div>
+
+<script>
+  const canvas = document.getElementById("pattern-canvas");
+  const ctx = canvas.getContext("2d");
+  const dots = Array.from(document.querySelectorAll(".dot"));
+
+  // Posições fixas das bolinhas no grid para o canvas desenhar
+  const dotPositions = {
+    "1": {x: 30, y: 30},
+    "2": {x: 150, y: 30},
+    "3": {x: 270, y: 30},
+    "4": {x: 30, y: 150},
+    "5": {x: 150, y: 150},
+    "6": {x: 270, y: 150},
+    "7": {x: 30, y: 270},
+    "8": {x: 150, y: 270},
+    "9": {x: 270, y: 270},
+  };
+
+  function drawPattern(patternIds) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#0af";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+
+    patternIds.forEach((id, index) => {
+      const dot = dots.find(d => d.dataset.id === id);
+      if (dot) {
+        dot.classList.add("active");
+        const pos = dotPositions[id];
+        if (index === 0) ctx.moveTo(pos.x, pos.y);
+        else ctx.lineTo(pos.x, pos.y);
+      }
+    });
+
+    ctx.stroke();
+  }
+
+  function getPatternFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const padrao = params.get("padrao");
+    if (padrao) {
+      const ids = padrao.split("-");
+      drawPattern(ids);
+    }
+  }
+
+  window.onload = getPatternFromURL;
+</script>
+
+</body>
+</html>
+
